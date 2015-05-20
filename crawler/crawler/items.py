@@ -5,20 +5,24 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+from scrapy import Item, Field
 
 
-class JobItem(scrapy.Item):
+class JobsBankItem(Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    title = scrapy.Field()
-    location = scrapy.Field()
-    industry = scrapy.Field()
-    categories = scrapy.Field()
-    empType = scrapy.Field()
-    description = scrapy.Field()
-    yearsOfExp = scrapy.Field()
-    postingDate = scrapy.Field()
-    closingDate = scrapy.Field()
-    requirements = scrapy.Field()
-
+    jobId = Field()
+    title = Field()
+    description = Field()
+    requirements = Field()
+    location = Field()
+    industry = Field()
+    categories = Field()
+    empType = Field()
+    workingHours = Field()
+    shiftPattern = Field()
+    salary = Field()
+    jobLevel = Field()
+    yearsOfExp = Field()
+    postingDate = Field()
+    closingDate = Field()
+    noOfVacancies = Field()
