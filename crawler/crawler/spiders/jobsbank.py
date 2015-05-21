@@ -2,12 +2,20 @@ from crawler.items import JobsBankItem
 from scrapy import FormRequest, log, Request
 from scrapy.selector import Selector
 from scrapy.spider import Spider
+from scrapy.http import TextResponse 
+from html2text import html2text
+from selenium import webdriver
+import pdb
+import nltk
 
 class JobsBankSpider(Spider):
     name = "jobsbank"
     allowed_domains = ["www.jobsbank.gov.sg"]
     start_urls = []
     current_page = 1
+
+    def __init__(self):
+        self.driver = webdriver.Firefox()
 
     def start_requests(self):
         return [
@@ -61,37 +69,46 @@ class JobsBankSpider(Spider):
             return
 
     def parse_job(self, response):
-        sel = Selector(response)
-        item = response.meta['item']
+        self.driver.get(response.url)
 
-        item["title"] = sel.xpath("//div[@class='jobDes']/h3/text()").extract()[0]
+        response = TextResponse(url=response.url, body=self.driver.page_source, encoding='utf-8')
+        self.driver.close()
+        sel = Selector(response)
+        # item = response.meta['item']
+        # with open("response.txt", "w") as f:
+        #     f.write(response.body_as_unicode())
+
+        item = JobsBankItem()
+
+        item["title"] = sel.xpath("//div[@class='jobDes']//h3/text()").extract()[0].strip()
         
         postingDate = sel.xpath("//div[@class='jobDes']//div/p/text()").extract()[0]
-        item["postingDate"] = postingDate[postingDate.index(":") + 1:]
+        item["postingDate"] = postingDate[postingDate.index(":") + 1:].strip()
 
         closingDate = sel.xpath("//div[@class='jobDes']//div/p/text()").extract()[1]
-        item["closingDate"] = closingDate[closingDate.index(":") + 1:]
+        item["closingDate"] = closingDate[closingDate.index(":") + 1:].strip()
 
-        item["description"] = sel.xpath("//div[@id='divMainJobDescription']/p/text()").extract()[0]
+        description = sel.xpath("//div[@id='divMainJobDescription']").extract()
+        item["description"] = ''.join([html2text(i) for i in description])
 
-        item["requirement"] = sel.xpath("//div[@id='divMainSkillsRequired']/p/text()").extract()[0]
+        item["requirements"] = sel.xpath("//div[@id='divMainSkillsRequired']/p/text()").extract()[0].strip()
 
         item["categories"] = sel.xpath("//div[@class='jd_contentRight']/dl[1]//li/span/text()").extract()
 
-        item["industry"] = sel.xpath("//div[@class='jd_contentRight']/dl[2]//span/text()").extract()[0]
+        item["industry"] = sel.xpath("//div[@class='jd_contentRight']/dl[2]//span/text()").extract()[0].strip()
 
         item["empType"] = sel.xpath("//div[@class='jd_contentRight']/ul[1]//li/span/text()").extract()
 
-        item["workingHours"] = sel.xpath("//div[@class='jd_contentRight']/ul[2]//li/span/text()").extract()
+        item["workingHours"] = sel.xpath("//div[@class='jd_contentRight']/ul[2]//li/span/text()").extract()[0].strip()
 
-        item["shiftPattern"] = sel.xpath("//div[@class='jd_contentRight']/ul[3]//li/span/text()").extract()
+        item["shiftPattern"] = sel.xpath("//div[@class='jd_contentRight']/ul[3]//li/span/text()").extract()[0].strip()
 
-        item["salary"] = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span/text()").extract()
+        item["salary"] = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span/text()").extract()[0].strip()
 
-        item["jobLevel"] = sel.xpath("//div[@class='jd_contentRight']/ul[5]//span/text()").extract()
+        item["jobLevel"] = sel.xpath("//div[@class='jd_contentRight']/ul[5]//span/text()").extract()[0].strip()
 
-        item["yearsOfExp"] = sel.xpath("//div[@class='jd_contentRight']/ul[6]//li/text()").extract()
+        item["yearsOfExp"] = sel.xpath("//div[@class='jd_contentRight']/ul[6]//li/text()").extract()[0].strip()
 
-        item["noOfVacancies"] = sel.xpath("//div[@class='jd_contentRight']/span[@class='text'][1]/text()").extract()
+        item["noOfVacancies"] = sel.xpath("//div[@class='jd_contentRight']/span[@class='text'][1]/text()").extract()[0].strip()
 
         yield item
