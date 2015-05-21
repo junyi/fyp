@@ -12,6 +12,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 import nltk
 import demjson
 
+import traceback
+
+
+def DEBUG(msg):
+    return log.msg(msg, level=log.DEBUG)
+
+def INFO(msg):
+    return log.msg(msg, level=log.INFO)
+
+def WARNING(msg):
+    return log.msg(msg, level=log.WARNING)
+
+def ERROR(msg):
+    return log.msg(msg, level=log.ERROR)
+
 class JobsBankSpider(Spider):
     name = "jobsbank"
     allowed_domains = ["www.jobsbank.gov.sg"]
@@ -34,9 +49,10 @@ class JobsBankSpider(Spider):
 
     def parse_page(self, response):
         sel = Selector(response)
-        self.total_no_of_pages = sel.xpath("//input[@id='totalPageNum']/@value").extract()[0].strip()
-        self.total_no_of_pages = int(self.total_no_of_pages)
-        log.msg(self.total_no_of_pages)
+        if self.total_no_of_pages == -1:
+            total = sel.xpath("//input[@id='totalPageNum']/@value").extract()[0].strip()
+            self.total_no_of_pages = int(total)
+            INFO(self.total_no_of_pages)
 
         jobs = sel.xpath("//article")
 
@@ -48,7 +64,7 @@ class JobsBankSpider(Spider):
                 ".//td[@class='jobDesActive']/a[@class='text']/text()").extract()[0]
 
             item["jobId"] = title[title.index("ID:") + 3: title.rfind(")")]
-            log.msg(item["jobId"])
+            INFO(item["jobId"])
             item["location"] = location
 
             job_detail_link = job.xpath(
@@ -61,19 +77,21 @@ class JobsBankSpider(Spider):
             yield request
 
         if self.current_page < self.total_no_of_pages:
-            log.msg("Done scraping page %d/%d" %
+            INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             self.current_page += 1
             yield FormRequest("https://www.jobsbank.gov.sg/ICMSPortal/portlets/JobBankHandler/SearchResult3.do",
                                formdata={
                                    '{actionForm.currentPageNumber}': str(self.current_page),
                                    '{actionForm.checkValidRequest}': 'YES',
-                                   '{actionForm.recordsPerPage}': '10'},  # Multiply by 5 to get the actual no of records
+                                   '{actionForm.recordsPerPage}': '10',  # Multiply by 5 to get the actual no of records
+                                   '{actionForm.searchType}': 'Quick Search'},
                                method="POST",
-                               callback=self.parse_page,
-                               dont_filter=True)
+                               callback=self.parse_page)
         else:
-            log.msg("Finished scraping")
+            INFO("Done scraping page %d/%d" %
+                    (self.current_page, self.total_no_of_pages))
+            INFO("Finished scraping")
             return
 
     def parse_job(self, response):
@@ -129,17 +147,19 @@ class JobsBankSpider(Spider):
             item["noOfVacancies"] = sel.xpath("//div[@class='jd_contentRight']/span[@class='text'][1]/text()").extract()[0].strip()
 
         except IndexError, e:
-            log.msg("Failed to crawl %s, recrawling..." % item["jobId"], level=log.WARNING)
-            request = Request(response.url, callback=self.parse_job, dont_filter=True)
-            request.meta['item'] = item
-            request.meta['retryCount'] = response.meta['retryCount'] + 1
+            traceback.print_exc()
 
-            if request.meta['retryCount'] > 5:
-                log.msg("Failed to crawl %s after 5 times, abandoning..." % item["jobId"], level=log.ERROR)
-                return
+        #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
+        #     request = Request(response.url, callback=self.parse_job, dont_filter=True)
+        #     request.meta['item'] = item
+        #     request.meta['retryCount'] = response.meta['retryCount'] + 1
 
-            yield request
-            return
+        #     if request.meta['retryCount'] > 5:
+        #         ERROR("Failed to crawl %s after 5 times, abandoning..." % item["jobId"])
+        #         return
+
+        #     yield request
+        #     return
 
         with open("output.txt", "a") as f:
             f.write(demjson.encode(item)+"\n")

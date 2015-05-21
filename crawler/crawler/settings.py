@@ -21,3 +21,4 @@ USER_AGENT = 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)'
 # SCHEDULER_MEMORY_QUEUE = 'scrapy.squeue.FifoMemoryQueue'
 
 DUPEFILTER_DEBUG = True
+LOG_LEVEL = "DEBUG"
