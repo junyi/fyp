@@ -1,5 +1,6 @@
 from crawler.items import JobsBankItem
-from scrapy import FormRequest, log, Request
+from crawler.utils import DEBUG, INFO, WARNING, ERROR
+from scrapy import FormRequest, Request
 from scrapy.selector import Selector
 from scrapy.spider import Spider
 from scrapy.http import TextResponse 
@@ -13,19 +14,6 @@ import nltk
 import demjson
 
 import traceback
-
-
-def DEBUG(msg):
-    return log.msg(msg, level=log.DEBUG)
-
-def INFO(msg):
-    return log.msg(msg, level=log.INFO)
-
-def WARNING(msg):
-    return log.msg(msg, level=log.WARNING)
-
-def ERROR(msg):
-    return log.msg(msg, level=log.ERROR)
 
 class JobsBankSpider(Spider):
     name = "jobsbank"
@@ -67,11 +55,11 @@ class JobsBankSpider(Spider):
             INFO(item["jobId"])
             item["location"] = location
 
-            job_detail_link = job.xpath(
+            job_detail_link = "https://www.jobsbank.gov.sg" + job.xpath(
                 ".//td[@class='jobDesActive']/a/@href").extract()[0]
+            item["url"] = job_detail_link
 
-            request = Request(
-                "https://www.jobsbank.gov.sg" + job_detail_link, callback=self.parse_job)
+            request = Request(job_detail_link, callback=self.parse_job)
             request.meta['item'] = item
             request.meta['retryCount'] = 0
             yield request
@@ -126,9 +114,11 @@ class JobsBankSpider(Spider):
             description = sel.xpath("//div[@id='divMainJobDescription']").extract()
             item["description"] = ''.join([html2text(i) for i in description])
 
-            item["requirements"] = sel.xpath("//div[@id='divMainSkillsRequired']/p/text()").extract()[0].strip()
+            requirements = sel.xpath("//div[@id='divMainSkillsRequired']").extract()
+            item["requirements"] = ''.join([html2text(i) for i in requirements])
 
-            item["categories"] = sel.xpath("//div[@class='jd_contentRight']/dl[1]//li/span/text()").extract()
+            categories = sel.xpath("//div[@class='jd_contentRight']/dl[1]//li/span/text()").extract()
+            item["categories"] = [i.strip() for i in categories]
 
             item["industry"] = sel.xpath("//div[@class='jd_contentRight']/dl[2]//span/text()").extract()[0].strip()
 
@@ -161,7 +151,7 @@ class JobsBankSpider(Spider):
         #     yield request
         #     return
 
-        with open("output.txt", "a") as f:
-            f.write(demjson.encode(item)+"\n")
+        # with open("output.txt", "a") as f:
+        #     f.write(demjson.encode(item)+"\n")
 
         yield item

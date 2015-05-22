@@ -22,3 +22,20 @@ USER_AGENT = 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)'
 
 DUPEFILTER_DEBUG = True
 LOG_LEVEL = "DEBUG"
+LOG_FILE = "out.log"
+
+ITEM_PIPELINES = {
+    'crawler.pipelines.MySQLStorePipeline': 800,
+    'crawler.pipelines.FilterFieldsPipeline': 900,
+    'crawler.pipelines.RequiredFieldsPipeline': 1000
+}
+
+# MYSQL_HOST = 'localhost'
+# MYSQL_DBNAME = 'jobsbank'
+# MYSQL_USER = 'crawler'
+# MYSQL_PASSWD = 'heejunyifypcrawler'
+
+MYSQL_HOST = 'localhost'
+MYSQL_DBNAME = 'jobsbank'
+MYSQL_USER = 'root'
+MYSQL_PASSWD = ''

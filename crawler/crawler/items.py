@@ -26,3 +26,4 @@ class JobsBankItem(Item):
     postingDate = Field()
     closingDate = Field()
     noOfVacancies = Field()
+    url = Field()
