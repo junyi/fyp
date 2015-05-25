@@ -23,7 +23,7 @@ class JobsBankSpider(Spider):
     total_no_of_pages = -1
 
     def __init__(self):
-        self.driver = webdriver.PhantomJS()
+        self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
 
     def start_requests(self):
         return [
