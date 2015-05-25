@@ -23,7 +23,7 @@ NEWSPIDER_MODULE = 'crawler.spiders'
 
 DUPEFILTER_DEBUG = True
 LOG_LEVEL = "INFO"
-LOG_FILE = "log/jobsbank_%s.log" % datetime.now().strftime("%Y%m%d_%H%M%S")
+# LOG_FILE = "log/jobsbank_%s.log" % datetime.now().strftime("%Y%m%d_%H%M%S")
 DOWNLOAD_DELAY = 4
 RANDOMIZE_DOWNLOAD_DELAY = True
 
@@ -31,6 +31,10 @@ ITEM_PIPELINES = {
     'crawler.pipelines.MySQLStorePipeline': 800,
     'crawler.pipelines.FilterFieldsPipeline': 900,
     'crawler.pipelines.RequiredFieldsPipeline': 1000
+}
+
+DOWNLOADER_MIDDLEWARES = {
+	'crawler.middleware.DbFilterMiddleware': 543
 }
 
 # MYSQL_HOST = 'localhost'

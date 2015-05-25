@@ -59,7 +59,7 @@ class JobsBankSpider(Spider):
                 ".//td[@class='jobDesActive']/a/@href").extract()[0]
             item["url"] = job_detail_link
 
-            request = Request(job_detail_link, callback=self.parse_job)
+            request = Request(job_detail_link, callback=self.parse_job, priority=1)
             request.meta['item'] = item
             request.meta['retryCount'] = 0
             yield request
@@ -69,6 +69,7 @@ class JobsBankSpider(Spider):
                     (self.current_page, self.total_no_of_pages))
             self.current_page += 1
             yield FormRequest("https://www.jobsbank.gov.sg/ICMSPortal/portlets/JobBankHandler/SearchResult3.do",
+                               priority=5,
                                formdata={
                                    '{actionForm.currentPageNumber}': str(self.current_page),
                                    '{actionForm.checkValidRequest}': 'YES',
@@ -137,7 +138,7 @@ class JobsBankSpider(Spider):
 
             item["noOfVacancies"] = sel.xpath("//div[@class='jd_contentRight']/span[@class='text'][1]/text()").extract()[0].strip()
 
-        except IndexError, e:
+        except IndexError, KeyError, e:
             traceback.print_exc()
 
         #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
