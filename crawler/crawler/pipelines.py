@@ -30,7 +30,7 @@ class FilterFieldsPipeline(object):
     def process_item(self, item, spider):
         for field in self.fields_to_filter:
             value = item[field]
-            item[field] = ' '.join(unicode(value).encode('unicode_escape')).split())
+            item[field] = ' '.join(value)
         else:
             return item
 
@@ -106,7 +106,7 @@ class MySQLStorePipeline(object):
 
         if ret:
             self._update(conn, "job", set_pairs=value_dict, where_pairs={'jobId': jobId})
-            INFO("Item updated in db: %s %r" % (jobId, item))
+            INFO("Item updated in db: %s" % (jobId))
         else:
             self._insert(conn, "job", value_dict)
             self._insert_categories(conn, item)
@@ -114,7 +114,7 @@ class MySQLStorePipeline(object):
             self._insert_industry(conn, item)
             self._insert_location(conn, item)
 
-            INFO("Item stored in db: %s %r" % (jobId, item))
+            INFO("Item stored in db: %s" % (jobId))
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 
 # Scrapy settings for crawler project
 #
@@ -14,15 +15,17 @@ SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)'
+# USER_AGENT = 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)'
 
 # DEPTH_PRIORITY = 1
 # SCHEDULER_DISK_QUEUE = 'scrapy.squeue.PickleFifoDiskQueue'
 # SCHEDULER_MEMORY_QUEUE = 'scrapy.squeue.FifoMemoryQueue'
 
 DUPEFILTER_DEBUG = True
-LOG_LEVEL = "DEBUG"
-LOG_FILE = "out.log"
+LOG_LEVEL = "INFO"
+LOG_FILE = "log/jobsbank_%s.log" % datetime.now().strftime("%Y%m%d_%H%M%S")
+DOWNLOAD_DELAY = 4
+RANDOMIZE_DOWNLOAD_DELAY = True
 
 ITEM_PIPELINES = {
     'crawler.pipelines.MySQLStorePipeline': 800,

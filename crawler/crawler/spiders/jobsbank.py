@@ -52,7 +52,7 @@ class JobsBankSpider(Spider):
                 ".//td[@class='jobDesActive']/a[@class='text']/text()").extract()[0]
 
             item["jobId"] = title[title.index("ID:") + 3: title.rfind(")")]
-            INFO(item["jobId"])
+            DEBUG(item["jobId"])
             item["location"] = location
 
             job_detail_link = "https://www.jobsbank.gov.sg" + job.xpath(
@@ -128,7 +128,8 @@ class JobsBankSpider(Spider):
 
             item["shiftPattern"] = sel.xpath("//div[@class='jd_contentRight']/ul[3]//li/span/text()").extract()[0].strip()
 
-            item["salary"] = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span").extract()[0].strip()
+            salary = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span/text()").extract()
+            item["salary"] = ''.join([html2text(i) for i in salary]).strip().replace('\n', '')
 
             item["jobLevel"] = sel.xpath("//div[@class='jd_contentRight']/ul[5]//span/text()").extract()[0].strip()
 
