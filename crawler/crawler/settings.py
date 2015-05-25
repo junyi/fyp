@@ -23,7 +23,7 @@ NEWSPIDER_MODULE = 'crawler.spiders'
 
 DUPEFILTER_DEBUG = True
 LOG_LEVEL = "INFO"
-# LOG_FILE = "log/jobsbank_%s.log" % datetime.now().strftime("%Y%m%d_%H%M%S")
+LOG_FILE = "log/jobsbank_%s.log" % datetime.now().strftime("%Y%m%d_%H%M%S")
 DOWNLOAD_DELAY = 4
 RANDOMIZE_DOWNLOAD_DELAY = True
 
