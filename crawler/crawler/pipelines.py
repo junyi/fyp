@@ -241,14 +241,13 @@ class MySQLStorePipeline(object):
             location_id = conn.lastrowid
 
 
-        for location_id in location_id_list:
-            ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
-            if not ret:
-                self._insert(conn, "assoc_job_location",\
-                    {
-                        "jobId": jobId, 
-                        "locationId": location_id
-                    })
+        ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
+        if not ret:
+            self._insert(conn, "assoc_job_location",\
+                {
+                    "jobId": jobId, 
+                    "locationId": location_id
+                })
 
 
 
