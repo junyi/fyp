@@ -139,7 +139,7 @@ class JobsBankSpider(Spider):
             item["noOfVacancies"] = sel.xpath("//div[@class='jd_contentRight']/span[@class='text'][1]/text()").extract()[0].strip()
 
         except (IndexError, KeyError) as e:
-            traceback.print_exc()
+            traceback.print_exc(file=open("log/error.log","a"))
 
         #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
         #     request = Request(response.url, callback=self.parse_job, dont_filter=True)

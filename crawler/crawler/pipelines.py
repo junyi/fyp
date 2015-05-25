@@ -119,7 +119,7 @@ class MySQLStorePipeline(object):
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
         # do nothing, just log
-        failure.printTraceback()
+        failure.printTraceback(file=open("log/error.log","a"))
         ERROR("FAILURE!!!")
 
     def _get_id(self, item):
