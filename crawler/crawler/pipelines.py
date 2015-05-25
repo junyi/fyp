@@ -30,7 +30,7 @@ class FilterFieldsPipeline(object):
     def process_item(self, item, spider):
         for field in self.fields_to_filter:
             value = item[field]
-            item[field] = ' '.join(unidecode(unicode(value)).split())
+            item[field] = ' '.join(unicode(value).encode('unicode_escape')).split())
         else:
             return item
 
@@ -93,7 +93,6 @@ class MySQLStorePipeline(object):
                     'title': item['title'], 
                     'description': item['description'], 
                     'requirements': item['requirements'], 
-                    'location': item['location'], 
                     'salary': item['salary'],
                     'shiftPattern': item['shiftPattern'],
                     'workingHours': item['workingHours'],
@@ -102,7 +101,6 @@ class MySQLStorePipeline(object):
                     'url': item['url'], 
                     'postingDate': parse(item['postingDate']),
                     'closingDate': parse(item['closingDate']),
-                    'industry': item['industry'],
                     'lastUpdated': now
                 }
 
@@ -113,6 +111,9 @@ class MySQLStorePipeline(object):
             self._insert(conn, "job", value_dict)
             self._insert_categories(conn, item)
             self._insert_emp_type(conn, item)
+            self._insert_industry(conn, item)
+            self._insert_location(conn, item)
+
             INFO("Item stored in db: %s %r" % (jobId, item))
 
     def _handle_error(self, failure, item, spider):
@@ -189,6 +190,67 @@ class MySQLStorePipeline(object):
                         "jobId": jobId, 
                         "empId": emp_id
                     })
+
+    def _insert_industry(self, conn, item):
+        """
+            Inserts all categories for an item if not already exist.
+            Also associates the categories to the item
+        """
+        jobId = self._get_id(item)
+
+        industry_id_list = []
+        industry = item['industry']
+
+        ret = self._check_if_exists(conn, "industry", {"description": industry})
+        if ret:
+            industry_id = self._get_one(conn, "industry", ["industryId"], {"description": industry})
+        else:
+            self._insert(conn, "industry",\
+                {
+                    'description': industry
+                })
+            industry_id = conn.lastrowid
+
+
+        ret = self._check_if_exists(conn, "assoc_job_industry", {"jobId": jobId, "industryId": industry_id})
+        if not ret:
+            self._insert(conn, "assoc_job_industry",\
+                {
+                    "jobId": jobId, 
+                    "industryId": industry_id
+                })
+
+    def _insert_location(self, conn, item):
+        """
+            Inserts all categories for an item if not already exist.
+            Also associates the categories to the item
+        """
+        jobId = self._get_id(item)
+
+        location_id_list = []
+        location = item['location']
+
+        ret = self._check_if_exists(conn, "location", {"description": location})
+        if ret:
+            location_id = self._get_one(conn, "location", ["locationId"], {"description": location})
+        else:
+            self._insert(conn, "location",\
+                {
+                    'description': location
+                })
+            location_id = conn.lastrowid
+
+
+        for location_id in location_id_list:
+            ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
+            if not ret:
+                self._insert(conn, "assoc_job_location",\
+                    {
+                        "jobId": jobId, 
+                        "locationId": location_id
+                    })
+
+
 
     def _check_if_exists(self, conn, table, where_pairs):
         where = ' AND '.join(["{key}=%s".format(key=k) for (k, v) in where_pairs.iteritems()])

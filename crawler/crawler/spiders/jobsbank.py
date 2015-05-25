@@ -128,7 +128,7 @@ class JobsBankSpider(Spider):
 
             item["shiftPattern"] = sel.xpath("//div[@class='jd_contentRight']/ul[3]//li/span/text()").extract()[0].strip()
 
-            item["salary"] = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span/text()").extract()[0].strip()
+            item["salary"] = sel.xpath("//div[@class='jd_contentRight']/ul[4]//span").extract()[0].strip()
 
             item["jobLevel"] = sel.xpath("//div[@class='jd_contentRight']/ul[5]//span/text()").extract()[0].strip()
 
