@@ -9,10 +9,13 @@ from html2text import html2text
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
+from urllib2 import URLError
+
 # import pdb
+import os
 import nltk
 import demjson
-
+import pickle
 import traceback
 
 class JobsBankSpider(Spider):
@@ -21,21 +24,34 @@ class JobsBankSpider(Spider):
     start_urls = []
     current_page = 1
     total_no_of_pages = -1
+    stop = False
 
-    def __init__(self):
+    def __init__(self, current_page=1):
         self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
+        self.current_page = current_page
 
     def start_requests(self):
         return [
             FormRequest("https://www.jobsbank.gov.sg/ICMSPortal/portlets/JobBankHandler/SearchResult.do",
                         formdata={
-                            '{actionForm.currentPageNumber}': '1',
+                            '{actionForm.currentPageNumber}': str(current_page),
                             '{actionForm.checkValidRequest}': 'YES',
                             '{actionForm.recordsPerPage}': '10'},  # Multiply by 5 to get the actual no of records
                         method="POST",
                         callback=self.parse_page)]
 
     def parse_page(self, response):
+        if self.stop:
+            INFO("Stopped parsing")
+            INFO("Storing current_page at page %s/%s" % (self.current_page, self.total_no_of_pages))
+            data = {
+                'current_page': self.current_page,
+                'total': self.total_no_of_pages
+            }
+            pickle.dump(data, open("session.p", "wb"))
+
+            return
+
         sel = Selector(response)
         if self.total_no_of_pages == -1:
             total = sel.xpath("//input[@id='totalPageNum']/@value").extract()[0].strip()
@@ -81,10 +97,20 @@ class JobsBankSpider(Spider):
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             INFO("Finished scraping")
+            if os.path.isfile("session.p"):
+                data = pickle.load(open("session.p", "rb"))
+                if data["current_page"] < self.current_page:
+                    os.remove("session.p")
+                    INFO("Removing obsolete session file")
             return
 
     def parse_job(self, response):
-        self.driver.get(response.url)
+        try:
+            self.driver.get(response.url)
+        except URLError, e:
+            ERROR("Connection error for job %s" % response.meta['item']['jobId'])
+            self.stop = True
+
 
         wait = WebDriverWait(self.driver, 10)
         wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
