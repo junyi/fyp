@@ -26,15 +26,14 @@ class IndustryIdFixer(object):
         return ret
 
     def get_items_with_id(self):
-    	stmt = """SELECT j.* FROM job j, industry i, assoc_job_industry aji 
-    			  WHERE aji.jobId = j.jobId AND
+    	stmt = """SELECT j.* FROM job j JOIN assoc_job_industry aji 
+    			  ON aji.jobId = j.jobId AND
     					aji.industryId = %s """ % self._id
 
     	with closing(self.conn.cursor()) as cursor:
             cursor.execute(stmt)
             print cursor._executed
             ret = cursor.fetchall()
-            print "Returned %r" % ret
         return ret
 
 
