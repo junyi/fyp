@@ -52,15 +52,18 @@ class JobsBankSpider(Spider):
                         method="POST",
                         callback=self.parse_page)]
 
+    def save_state(self):
+        INFO("Storing current_page at page %s/%s" % (self.current_page, self.total_no_of_pages))
+        data = {
+            'current_page': self.current_page,
+            'total': self.total_no_of_pages
+        }
+        pickle.dump(data, open(SESSION_P, "wb"))
+
     def parse_page(self, response):
         if self.stop:
             INFO("Received stop signal: stopped parsing")
-            INFO("Storing current_page at page %s/%s" % (self.current_page, self.total_no_of_pages))
-            data = {
-                'current_page': self.current_page,
-                'total': self.total_no_of_pages
-            }
-            pickle.dump(data, open(SESSION_P, "wb"))
+            self.save_state()
 
             return
 
@@ -96,6 +99,7 @@ class JobsBankSpider(Spider):
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             self.current_page += 1
+            self.save_state()
             yield FormRequest("https://www.jobsbank.gov.sg/ICMSPortal/portlets/JobBankHandler/SearchResult3.do",
                                priority=5,
                                formdata={
