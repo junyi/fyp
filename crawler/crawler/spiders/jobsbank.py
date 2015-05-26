@@ -35,7 +35,7 @@ class JobsBankSpider(Spider):
         return [
             FormRequest("https://www.jobsbank.gov.sg/ICMSPortal/portlets/JobBankHandler/SearchResult.do",
                         formdata={
-                            '{actionForm.currentPageNumber}': str(current_page),
+                            '{actionForm.currentPageNumber}': str(self.current_page),
                             '{actionForm.checkValidRequest}': 'YES',
                             '{actionForm.recordsPerPage}': '10'},  # Multiply by 5 to get the actual no of records
                         method="POST",
