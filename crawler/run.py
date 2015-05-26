@@ -71,4 +71,9 @@ def main():
     reactor.run() # the script will block here until the spider_closed signal was sent
 
 if __name__ == '__main__':
+    try:
+        if sys.platform is not 'win32':
+            os.system("killall -9 phantomjs")
+    except Exception, e:
+        ERROR("%r" % e)
     main()
