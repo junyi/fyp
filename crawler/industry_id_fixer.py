@@ -134,4 +134,4 @@ if __name__ == '__main__':
 	print "Found %d items with id=%d" % (fixer.get_count(), fixer._id)
 	items = fixer.get_items_with_id()
 	for item in items:
-		fixer.get_correct_info(item)
+		fixer.fix_item(item)
