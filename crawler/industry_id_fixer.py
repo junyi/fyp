@@ -70,7 +70,6 @@ class IndustryIdFixer(object):
     	stmt = "SELECT COUNT(1) FROM industry"
     	with closing(self.conn.cursor()) as cursor:
             cursor.execute(stmt)
-            print cursor._executed
             ret = cursor.fetchone()[0]
             print "Returned %r" % ret
         return ret
@@ -82,7 +81,6 @@ class IndustryIdFixer(object):
 
     	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
             cursor.execute(stmt)
-            print cursor._executed
             ret = cursor.fetchall()
         return ret
 
@@ -91,6 +89,8 @@ class IndustryIdFixer(object):
     	job_id = item['jobId']
     	old_desc = item['oldDesc']
     	old_industry_id = item['oldIndustryId']
+
+    	print "Processing job %s" % job_id
 
     	try:
     		self.driver.get(url)
