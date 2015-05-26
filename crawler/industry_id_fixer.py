@@ -1,11 +1,8 @@
 import MySQLdb as mdb
+from contextlib import closing
 
 class IndustryIdFixer(object):
-    def __init__(self, conn, id=1):
-        self.conn = conn
-
-    @classmethod
-    def from_settings(cls, settings):        
+    def __init__(self, id=1):
         dbargs = dict(
             host=settings['MYSQL_HOST'],
             db=settings['MYSQL_DBNAME'],
@@ -14,8 +11,7 @@ class IndustryIdFixer(object):
             charset='utf8',
             use_unicode=True,
         )
-        conn = mdb.connect(**dbargs)
-        return cls(conn)
+        self.conn = mdb.connect(**dbargs)
 
     def get_count(self):
     	stmt = "SELECT COUNT(1) FROM industry"
