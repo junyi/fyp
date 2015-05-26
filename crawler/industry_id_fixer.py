@@ -90,7 +90,7 @@ class IndustryIdFixer(object):
     	url = item['url']
     	job_id = item['jobId']
     	old_desc = item['oldDesc']
-    	old_industry_id = item['old_industry_id']
+    	old_industry_id = item['oldIndustryId']
 
     	try:
     		self.driver.get(url)
