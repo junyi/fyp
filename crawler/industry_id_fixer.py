@@ -1,9 +1,10 @@
 import MySQLdb as mdb
 from contextlib import closing
-from scrapy.conf import settings
+from scrapy.utils.project import get_project_settings
 
 class IndustryIdFixer(object):
     def __init__(self, id=1):
+    	settings = get_project_settings()
         dbargs = dict(
             host=settings['MYSQL_HOST'],
             db=settings['MYSQL_DBNAME'],
