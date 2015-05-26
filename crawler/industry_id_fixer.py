@@ -46,9 +46,11 @@ class IndustryIdFixer(object):
 	            stmt += ' WHERE {where}'
 	            where = ' AND '.join(["{key}=%s".format(key=k) for (k, v) in where_pairs.iteritems()])
 	            values = tuple(where_pairs.values())
+	            print stmt
 	            cursor.execute(stmt.format(where=where), values)
 	        else:
 	            cursor.execute(stmt)
+	        print cursor._executed
 
         	ret = cursor.fetchone()[0]
 
