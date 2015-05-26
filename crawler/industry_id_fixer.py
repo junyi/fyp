@@ -12,6 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
 import pdb
+from urllib2 import URLError
 
 class IndustryIdFixer(object):
     def __init__(self, _id=1):
