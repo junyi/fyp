@@ -12,7 +12,7 @@ from scrapy.utils.project import get_project_settings
 from scrapy.utils.ossignal import install_shutdown_handlers, signal_names
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-SESSION_P = os.path.join(CUR_DIR, "session.p")
+SESSION_P = os.path.join(CUR_DIR, "crawler", "session.p")
 retry_count = 0
 
 def on_spider_closed():
