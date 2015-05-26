@@ -196,17 +196,17 @@ class MySQLStorePipeline(object):
         """
         jobId = self._get_id(item)
 
-        industry_id_list = []
         industry = item['industry']
 
         ret = self._check_if_exists(conn, "industry", {"description": industry})
         if ret:
             industry_id = self._get_one(conn, "industry", ["industryId"], {"description": industry})
         else:
-            industry_id = self._insert(conn, "industry",\
+            self._insert(conn, "industry",\
                 {
                     'description': industry
                 })
+            industry_id = self._get_one(conn, "industry", ["industryId"], {"description": industry})
 
 
         ret = self._check_if_exists(conn, "assoc_job_industry", {"jobId": jobId, "industryId": industry_id})
