@@ -261,7 +261,7 @@ class MySQLStorePipeline(object):
         select_fields = ', '.join(select_fields)
         stmt = """SELECT %s from %s""" % (select_fields, table)
         
-        if not where_pairs:
+        if where_pairs:
             stmt += ' WHERE {where}'
             where = ' AND '.join(["{key}=%s".format(key=k) for (k, v) in where_pairs.iteritems()])
             values = tuple(where_pairs.values())
