@@ -31,7 +31,6 @@ class JobsBankSpider(Spider):
     stop = False
 
     def __init__(self, current_page=1, retry_count=0):
-        self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
         INFO("Current retry count at %d" % retry_count)
         self.current_page = current_page
         dispatcher.connect(self.spider_closed, signals.spider_closed)
@@ -39,8 +38,6 @@ class JobsBankSpider(Spider):
     def spider_closed(self, spider): 
         if spider is not self:
             return
-        if self.driver:
-            self.driver.quit()
 
     def start_requests(self):
         return [
@@ -122,13 +119,14 @@ class JobsBankSpider(Spider):
 
     def parse_job(self, response):
         try:
+            if 
             self.driver.get(response.url)
         except URLError, e:
             ERROR("Connection error for job %s" % response.meta['item']['jobId'])
             self.stop = True
             return
 
-
+        self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
         wait = WebDriverWait(self.driver, 10)
         wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
 
@@ -183,6 +181,8 @@ class JobsBankSpider(Spider):
 
         except (IndexError, KeyError) as e:
             traceback.print_exc(file=open("log/error.log","a"))
+        finally:
+            self.driver.quit()
 
         #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
         #     request = Request(response.url, callback=self.parse_job, dont_filter=True)
