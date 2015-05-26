@@ -19,6 +19,9 @@ import demjson
 import pickle
 import traceback
 
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+SESSION_P = os.path.join(CUR_DIR, "session.p")
+
 class JobsBankSpider(Spider):
     name = "jobsbank"
     allowed_domains = ["www.jobsbank.gov.sg"]
@@ -57,7 +60,7 @@ class JobsBankSpider(Spider):
                 'current_page': self.current_page,
                 'total': self.total_no_of_pages
             }
-            pickle.dump(data, open("session.p", "wb"))
+            pickle.dump(data, open(SESSION_P, "wb"))
 
             return
 
@@ -106,10 +109,10 @@ class JobsBankSpider(Spider):
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             INFO("Finished scraping")
-            if os.path.isfile("session.p"):
-                data = pickle.load(open("session.p", "rb"))
+            if os.path.isfile(SESSION_P):
+                data = pickle.load(open(SESSION_P, "rb"))
                 if data["current_page"] < self.current_page:
-                    os.remove("session.p")
+                    os.remove(SESSION_P)
                     INFO("Removing obsolete session file")
             return
 

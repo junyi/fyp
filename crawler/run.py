@@ -7,18 +7,20 @@ from scrapy import log, signals
 from crawler.spiders.jobsbank import JobsBankSpider
 from scrapy.utils.project import get_project_settings
 
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+SESSION_P = os.path.join(CUR_DIR, "session.p")
 retry_count = 0
 
 def on_spider_closed():
 	retry_count += 1
-	if os.path.isfile("session.p") and retry_count < 5:
+	if os.path.isfile(SESSION_P) and retry_count < 5:
 		main()
 	else:
 		return
 
 def main():
-	if os.path.isfile("session.p"):
-		data = pickle.load(open("session.p", "rb"))
+	if os.path.isfile(SESSION_P):
+		data = pickle.load(open(SESSION_P, "rb"))
 		try:
 			current_page = data["current_page"]
 			total = data["total"]
