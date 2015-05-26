@@ -46,9 +46,8 @@ def main():
 	crawler.crawl(spider)
 	crawler.start()
 
-	LOG_LEVEL = settings['LOG_LEVEL']
 	LOG_FILE = settings['LOG_FILE']
-	log.start(logfile=LOG_FILE, loglevel=LOG_LEVEL)
+	log.start(LOG_FILE, loglevel=log.INFO)
 	reactor.run() # the script will block here until the spider_closed signal was sent
 
 if __name__ == '__main__':
