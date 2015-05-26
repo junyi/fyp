@@ -142,11 +142,10 @@ class MySQLStorePipeline(object):
             if ret:
                 category_id = self._get_one(conn, "job_category", ["categoryId"], {"category": category})
             else:
-                self._insert(conn, "job_category",\
+                category_id = self._insert(conn, "job_category",\
                     {
                         'category': category
                     })
-                category_id = conn.lastrowid
 
             category_id_list.append(category_id)
 
@@ -174,11 +173,10 @@ class MySQLStorePipeline(object):
             if ret:
                 emp_id = self._get_one(conn, "employment_type", ["empId"], {"type": etype})
             else:
-                self._insert(conn, "employment_type",\
+                emp_id = self._insert(conn, "employment_type",\
                     {
                         'type': etype
                     })
-                emp_id = conn.lastrowid
 
             emp_type_id_list.append(emp_id)
 
@@ -205,11 +203,10 @@ class MySQLStorePipeline(object):
         if ret:
             industry_id = self._get_one(conn, "industry", ["industryId"], {"description": industry})
         else:
-            self._insert(conn, "industry",\
+            industry_id = self._insert(conn, "industry",\
                 {
                     'description': industry
                 })
-            industry_id = conn.lastrowid
 
 
         ret = self._check_if_exists(conn, "assoc_job_industry", {"jobId": jobId, "industryId": industry_id})
@@ -234,11 +231,10 @@ class MySQLStorePipeline(object):
         if ret:
             location_id = self._get_one(conn, "location", ["locationId"], {"description": location})
         else:
-            self._insert(conn, "location",\
+            location_id = self._insert(conn, "location",\
                 {
                     'description': location
                 })
-            location_id = conn.lastrowid
 
 
         ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
