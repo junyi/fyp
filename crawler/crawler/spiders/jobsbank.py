@@ -20,7 +20,7 @@ import pickle
 import traceback
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-SESSION_P = os.path.join(CUR_DIR, "session.p")
+SESSION_P = os.path.join(CUR_DIR, "..", "session.p")
 
 class JobsBankSpider(Spider):
     name = "jobsbank"
