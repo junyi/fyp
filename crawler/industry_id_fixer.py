@@ -3,7 +3,8 @@ from contextlib import closing
 from scrapy.utils.project import get_project_settings
 
 class IndustryIdFixer(object):
-    def __init__(self, id=1):
+    def __init__(self, _id=1):
+    	self._id = _id
     	settings = get_project_settings()
         dbargs = dict(
             host=settings['MYSQL_HOST'],
@@ -24,6 +25,20 @@ class IndustryIdFixer(object):
             print "Returned %r" % ret
         return ret
 
+    def get_items_with_id(self):
+    	stmt = """SELECT j.* FROM job j, industry i, assoc_job_industry aji 
+    			  WHERE aji.jobId = j.jobId AND
+    					aji.industryId = %s """ % self._id
+
+    	with closing(self.conn.cursor()) as cursor:
+            cursor.execute(stmt)
+            print cursor._executed
+            ret = cursor.fetchall()
+            print "Returned %r" % ret
+        return ret
+
+
 if __name__ == '__main__':
 	fixer = IndustryIdFixer()
-	print fixer.get_count()
+	print "Found %d items with id=%d" % (fixer.get_count(), fixer._id)
+	print fixer.get_items_with_id()
