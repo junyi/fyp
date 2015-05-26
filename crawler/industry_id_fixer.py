@@ -17,9 +17,9 @@ class IndustryIdFixer(object):
     	stmt = "SELECT COUNT(1) FROM industry"
     	with closing(self.conn.cursor()) as cursor:
             cursor.execute(stmt, (values))
-            DEBUG(cursor._executed)
+            print cursor._executed
             ret = cursor.fetchone()[0]
-            DEBUG("Returned %r" % ret)
+            print "Returned %r" % ret
         return ret
 
 if __name__ == '__main__':
