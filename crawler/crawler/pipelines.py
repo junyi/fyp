@@ -113,6 +113,7 @@ class MySQLStorePipeline(object):
             self._insert_emp_type(conn, item)
             self._insert_industry(conn, item)
             self._insert_location(conn, item)
+            self._insert_job_level(conn, item)
 
             INFO("Item stored in db: %s" % (jobId))
 
@@ -243,6 +244,33 @@ class MySQLStorePipeline(object):
                 {
                     "jobId": jobId, 
                     "locationId": location_id
+                })
+
+    def _insert_job_level(self, conn, item):
+        """
+            Inserts all categories for an item if not already exist.
+            Also associates the categories to the item
+        """
+        jobId = self._get_id(item)
+
+        job_level = item['jobLevel']
+
+        ret = self._check_if_exists(conn, "job_level", {"description": job_level})
+        if ret:
+            job_level_id = self._get_one(conn, "job_level", ["jobLevelId"], {"description": job_level})
+        else:
+            job_level_id = self._insert(conn, "job_level",\
+                {
+                    'description': job_level
+                })
+
+
+        ret = self._check_if_exists(conn, "assoc_job_job_level", {"jobId": jobId, "jobLevelId": job_level})
+        if not ret:
+            self._insert(conn, "assoc_job_job_level",\
+                {
+                    "jobId": jobId, 
+                    "jobLevelId": job_level_id
                 })
 
 
