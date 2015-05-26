@@ -26,8 +26,9 @@ class JobsBankSpider(Spider):
     total_no_of_pages = -1
     stop = False
 
-    def __init__(self, current_page=1):
+    def __init__(self, current_page=1, retry_count=0):
         self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
+        INFO("Current retry count at %d" % retry_count)
         self.current_page = current_page
 
     def start_requests(self):

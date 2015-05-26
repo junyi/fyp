@@ -25,7 +25,7 @@ def main():
 	else:
 		current_page = 1
 
-	spider = JobsBankSpider(current_page=current_page)
+	spider = JobsBankSpider(current_page=current_page, retry_count=retry_count)
 	settings = get_project_settings()
 	crawler = Crawler(settings)
 	crawler.signals.connect(reactor.stop, signal=signals.spider_closed)
