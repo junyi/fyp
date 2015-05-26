@@ -77,7 +77,7 @@ class IndustryIdFixer(object):
 
     def get_items_with_id(self):
     	stmt = """SELECT j.jobId, j.url, i.industryId AS oldIndustryId, i.description AS oldDesc FROM job j JOIN assoc_job_industry aji 
-    			  ON aji.jobId = j.jobId AND aji.industryId = 1
+    			  ON aji.jobId = j.jobId AND aji.industryId = %s
 				  JOIN industry i ON aji.industryId = i.industryId """ % self._id
 
     	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
