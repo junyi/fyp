@@ -125,6 +125,7 @@ class IndustryIdFixer(object):
 
     	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
         	cursor.execute(stmt, (new_industry_id, job_id, old_industry_id))
+        	self.conn.commit()
         	print "Fixed new industryId to be %d" % new_industry_id
 
 
