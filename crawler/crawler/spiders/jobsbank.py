@@ -122,6 +122,7 @@ class JobsBankSpider(Spider):
         except URLError, e:
             ERROR("Connection error for job %s" % response.meta['item']['jobId'])
             self.stop = True
+            return
 
 
         wait = WebDriverWait(self.driver, 10)

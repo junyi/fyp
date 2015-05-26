@@ -33,6 +33,9 @@ class DbFilterMiddleware(object):
         return ret
 
     def process_request(self, request, spider):
+        if hasattr(spider, 'stop') and spider.stop:
+            raise IgnoreRequest("Stopped: Ignoring job %s" % job_id)
+
         if 'item' in request.meta:
             job_id = request.meta['item']['jobId']
 
