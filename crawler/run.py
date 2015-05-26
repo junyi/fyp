@@ -8,6 +8,7 @@ from scrapy import log, signals
 from crawler.utils import DEBUG, INFO, WARNING, ERROR
 from crawler.spiders.jobsbank import JobsBankSpider
 from scrapy.utils.project import get_project_settings
+from scrapy.utils.ossignal import install_shutdown_handlers, signal_names
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 SESSION_P = os.path.join(CUR_DIR, "session.p")
@@ -38,6 +39,24 @@ def main():
 		current_page = 1
 
 	spider = JobsBankSpider(current_page=current_page, retry_count=retry_count)
+
+	def handle_shutdown(signum, _):
+	    signame = signal_names[signum]
+	    INFO("Received %s, shutting down gracefully." % signame)
+
+	    if isinstance(spider, JobsBankSpider):
+            INFO("Storing current_page at page %s/%s" % (spider.current_page, spider.total_no_of_pages))
+            data = {
+                'current_page': spider.current_page,
+                'total': spider.total_no_of_pages
+            }
+            pickle.dump(data, open(SESSION_P, "wb"))
+
+		if not sys.platform == 'win32':
+		    os.system("killall -9 phantomjs")
+
+	install_shutdown_handlers(handle_shutdown)
+    
 	settings = get_project_settings()
 	crawler = Crawler(settings)
 	crawler.signals.connect(reactor.stop, signal=signals.spider_closed)

@@ -54,7 +54,7 @@ class JobsBankSpider(Spider):
 
     def parse_page(self, response):
         if self.stop:
-            INFO("Stopped parsing")
+            INFO("Received stop signal: stopped parsing")
             INFO("Storing current_page at page %s/%s" % (self.current_page, self.total_no_of_pages))
             data = {
                 'current_page': self.current_page,
