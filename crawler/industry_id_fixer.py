@@ -34,7 +34,7 @@ class IndustryIdFixer(object):
         stmt = """SELECT EXISTS(SELECT 1 FROM {table} WHERE {where})""".format(table=table, where=where)
     	with closing(self.conn.cursor()) as cursor:
 	        cursor.execute(stmt, (values))
-	        ret = conn.fetchone()[0]
+	        ret = cursor.fetchone()[0]
         return ret
 
     def _get_one(self, table, select_fields, where_pairs=None):
