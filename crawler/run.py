@@ -5,6 +5,7 @@ import pickle
 from twisted.internet import reactor
 from scrapy.crawler import Crawler
 from scrapy import log, signals
+from crawler.utils import DEBUG, INFO, WARNING, ERROR
 from crawler.spiders.jobsbank import JobsBankSpider
 from scrapy.utils.project import get_project_settings
 
@@ -13,6 +14,7 @@ SESSION_P = os.path.join(CUR_DIR, "session.p")
 retry_count = 0
 
 def on_spider_closed():
+	global retry_count
 	retry_count += 1
 	if os.path.isfile(SESSION_P) and retry_count < 5:
 		main()
@@ -20,6 +22,8 @@ def on_spider_closed():
 		return
 
 def main():
+	global retry_count
+	INFO("Running main: retry_count=%d" % retry_count)
 	if os.path.isfile(SESSION_P):
 		data = pickle.load(open(SESSION_P, "rb"))
 		try:
