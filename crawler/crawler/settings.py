@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+import sys
 
 # Scrapy settings for crawler project
 #
@@ -37,12 +38,14 @@ DOWNLOADER_MIDDLEWARES = {
 	'crawler.middleware.DbFilterMiddleware': 543
 }
 
-# MYSQL_HOST = 'localhost'
-# MYSQL_DBNAME = 'jobsbank'
-# MYSQL_USER = 'crawler'
-# MYSQL_PASSWD = 'heejunyifypcrawler'
+if sys.platform == 'win32':
+	MYSQL_HOST = 'localhost'
+	MYSQL_DBNAME = 'jobsbank'
+	MYSQL_USER = 'root'
+	MYSQL_PASSWD = ''
+else:
+	MYSQL_HOST = 'localhost'
+	MYSQL_DBNAME = 'jobsbank'
+	MYSQL_USER = 'crawler'
+	MYSQL_PASSWD = 'heejunyifypcrawler'
 
-MYSQL_HOST = 'localhost'
-MYSQL_DBNAME = 'jobsbank'
-MYSQL_USER = 'root'
-MYSQL_PASSWD = ''
