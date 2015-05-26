@@ -121,7 +121,7 @@ class IndustryIdFixer(object):
         stmt = """UPDATE assoc_job_industry
         		  SET industryId = %s
         		  WHERE jobId = %s AND
-        		  		industryId = %s0
+        		  		industryId = %s
         		"""
 
     	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
