@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import pickle
 from twisted.internet import reactor
 from scrapy.crawler import Crawler
 from scrapy import log, signals
