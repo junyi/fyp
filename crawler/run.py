@@ -17,7 +17,7 @@ def on_spider_closed():
 	global retry_count
 	retry_count += 1
 	if os.path.isfile(SESSION_P) and retry_count < 5:
-		main()
+		os.execv(__file__, sys.argv) # Restart this script
 	else:
 		return
 
@@ -29,6 +29,9 @@ def main():
 		try:
 			current_page = data["current_page"]
 			total = data["total"]
+			INFO("Found session.p")
+			INFO("[session.p] current_page=%d" % current_page)
+
 		except Exception:
 			current_page = 1
 	else:
