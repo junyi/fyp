@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 25, 2015 at 12:57 AM
+-- Generation Time: May 26, 2015 at 04:17 AM
 -- Server version: 5.5.43-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.9
 
@@ -60,6 +60,19 @@ CREATE TABLE IF NOT EXISTS `assoc_job_job_category` (
   PRIMARY KEY (`jobId`,`categoryId`),
   KEY `jobId` (`jobId`,`categoryId`),
   KEY `categoryId` (`categoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assoc_job_job_level`
+--
+
+CREATE TABLE IF NOT EXISTS `assoc_job_job_level` (
+  `jobId` varchar(20) NOT NULL,
+  `jobLevelId` smallint(6) NOT NULL,
+  PRIMARY KEY (`jobId`,`jobLevelId`),
+  KEY `jobLevelId` (`jobLevelId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -139,6 +152,18 @@ CREATE TABLE IF NOT EXISTS `job_category` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `job_level`
+--
+
+CREATE TABLE IF NOT EXISTS `job_level` (
+  `jobLevelId` smallint(6) NOT NULL AUTO_INCREMENT,
+  `description` tinytext NOT NULL,
+  PRIMARY KEY (`jobLevelId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `location`
 --
 
@@ -172,6 +197,13 @@ ALTER TABLE `assoc_job_industry`
 ALTER TABLE `assoc_job_job_category`
   ADD CONSTRAINT `assoc_job_job_category_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `job_category` (`categoryId`) ON UPDATE CASCADE,
   ADD CONSTRAINT `assoc_job_job_category_ibfk_2` FOREIGN KEY (`jobId`) REFERENCES `job` (`jobId`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `assoc_job_job_level`
+--
+ALTER TABLE `assoc_job_job_level`
+  ADD CONSTRAINT `assoc_job_job_level_ibfk_2` FOREIGN KEY (`jobLevelId`) REFERENCES `job_level` (`jobLevelId`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `assoc_job_job_level_ibfk_1` FOREIGN KEY (`jobId`) REFERENCES `job` (`jobId`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `assoc_job_location`
