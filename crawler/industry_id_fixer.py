@@ -1,5 +1,6 @@
 import MySQLdb as mdb
 from contextlib import closing
+from scrapy.conf import settings
 
 class IndustryIdFixer(object):
     def __init__(self, id=1):
@@ -16,7 +17,7 @@ class IndustryIdFixer(object):
     def get_count(self):
     	stmt = "SELECT COUNT(1) FROM industry"
     	with closing(self.conn.cursor()) as cursor:
-            cursor.execute(stmt, (values))
+            cursor.execute(stmt)
             print cursor._executed
             ret = cursor.fetchone()[0]
             print "Returned %r" % ret
