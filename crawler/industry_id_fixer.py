@@ -115,8 +115,6 @@ class IndustryIdFixer(object):
                     'description': industry
                 })
 
-		pdb.set_trace()
-
         stmt = """UPDATE assoc_job_industry
         		  SET industryId = %s
         		  WHERE jobId = %s AND
@@ -125,6 +123,7 @@ class IndustryIdFixer(object):
 
     	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
         	cursor.execute(stmt, (new_industry_id, job_id, old_industry_id))
+        	print "Fixed new industryId to be %d" % new_industry_id
 
 
 
