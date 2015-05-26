@@ -119,14 +119,13 @@ class JobsBankSpider(Spider):
 
     def parse_job(self, response):
         try:
-            if 
+            self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
             self.driver.get(response.url)
         except URLError, e:
             ERROR("Connection error for job %s" % response.meta['item']['jobId'])
             self.stop = True
             return
 
-        self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
         wait = WebDriverWait(self.driver, 10)
         wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
 
