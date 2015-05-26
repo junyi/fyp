@@ -1,9 +1,10 @@
 from crawler.items import JobsBankItem
 from crawler.utils import DEBUG, INFO, WARNING, ERROR
-from scrapy import FormRequest, Request
+from scrapy import FormRequest, Request, signals
 from scrapy.selector import Selector
 from scrapy.spider import Spider
-from scrapy.http import TextResponse 
+from scrapy.http import TextResponse
+from scrapy.xlib.pydispatch import dispatcher
 from html2text import html2text
 
 from selenium import webdriver
@@ -30,6 +31,13 @@ class JobsBankSpider(Spider):
         self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
         INFO("Current retry count at %d" % retry_count)
         self.current_page = current_page
+        dispatcher.connect(self.spider_closed, signals.spider_closed)
+
+    def spider_closed(self, spider): 
+        if spider is not self:
+            return
+        if self.driver:
+            self.driver.quit()
 
     def start_requests(self):
         return [
@@ -167,6 +175,8 @@ class JobsBankSpider(Spider):
 
         except (IndexError, KeyError) as e:
             traceback.print_exc(file=open("log/error.log","a"))
+        finally:
+            self.driver.close()
 
         #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
         #     request = Request(response.url, callback=self.parse_job, dont_filter=True)

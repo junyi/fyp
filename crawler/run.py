@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 from twisted.internet import reactor
 from scrapy.crawler import Crawler
