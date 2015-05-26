@@ -32,7 +32,7 @@ class IndustryIdFixer(object):
         where = ' AND '.join(["{key}=%s".format(key=k) for (k, v) in where_pairs.iteritems()])
         values = tuple(where_pairs.values())
         stmt = """SELECT EXISTS(SELECT 1 FROM {table} WHERE {where})""".format(table=table, where=where)
-    	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
+    	with closing(self.conn.cursor()) as cursor:
 	        cursor.execute(stmt, (values))
 	        ret = conn.fetchone()[0]
         return ret
@@ -41,7 +41,7 @@ class IndustryIdFixer(object):
         select_fields = ', '.join(select_fields)
         stmt = """SELECT %s from %s""" % (select_fields, table)
         
-    	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
+    	with closing(self.conn.cursor()) as cursor:
 	        if not where_pairs:
 	            stmt += ' WHERE {where}'
 	            where = ' AND '.join(["{key}=%s".format(key=k) for (k, v) in where_pairs.iteritems()])
@@ -60,7 +60,7 @@ class IndustryIdFixer(object):
         args = tuple(field_value_pairs.values())
 
         stmt = "INSERT INTO {table} ({fields}) VALUES ({template})".format(table=table, fields=fields, template=template)
-    	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
+    	with closing(self.conn.cursor()) as cursor:
         	cursor.execute(stmt, args)
         	lastrowid = cursor.lastrowid
 
@@ -68,7 +68,7 @@ class IndustryIdFixer(object):
 
     def get_count(self):
     	stmt = "SELECT COUNT(1) FROM industry"
-    	with closing(self.conn.cursor(cursors.DictCursor)) as cursor:
+    	with closing(self.conn.cursor()) as cursor:
             cursor.execute(stmt)
             print cursor._executed
             ret = cursor.fetchone()[0]
