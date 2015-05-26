@@ -178,8 +178,6 @@ class JobsBankSpider(Spider):
 
         except (IndexError, KeyError) as e:
             traceback.print_exc(file=open("log/error.log","a"))
-        finally:
-            self.driver.close()
 
         #     WARNING("Failed to crawl %s, recrawling..." % item["jobId"])
         #     request = Request(response.url, callback=self.parse_job, dont_filter=True)
