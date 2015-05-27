@@ -33,8 +33,16 @@ class JobsBankSpider(Spider):
 
     def __init__(self, current_page=1, retry_count=0, stop_page=-1):
         INFO("Current retry count at %d" % retry_count)
+
         self.current_page = current_page
         self.stop_page = stop_page
+
+        if self.stop_page != -1 and self.current_page >= self.stop_page:
+            INFO("current_page >= stop_page: %d > %d" % (self.current_page, self.stop_page))
+            INFO("Resetting current_page to 1")
+            self.current_page = 1
+            self.save_state()
+        
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
     def spider_closed(self, spider): 
