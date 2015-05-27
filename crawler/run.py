@@ -30,7 +30,8 @@ def main():
         data = pickle.load(open(SESSION_P, "rb"))
         try:
             current_page = data["current_page"]
-            total = data["total"]
+            total = data.get("total", -1)
+            stop_page = data.get("stop_page", -1)
             INFO("Found session.p")
             INFO("[session.p] current_page=%d" % current_page)
 
@@ -39,7 +40,7 @@ def main():
     else:
         current_page = 1
 
-    spider = JobsBankSpider(current_page=current_page, retry_count=retry_count)
+    spider = JobsBankSpider(current_page=current_page, retry_count=retry_count, stop_page=stop_page)
 
     def handle_shutdown(signum, _):
         signame = signal_names[signum]

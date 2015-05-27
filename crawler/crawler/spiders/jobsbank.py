@@ -27,12 +27,14 @@ class JobsBankSpider(Spider):
     allowed_domains = ["www.jobsbank.gov.sg"]
     start_urls = []
     current_page = 1
+    stop_page = -1
     total_no_of_pages = -1
     stop = False
 
-    def __init__(self, current_page=1, retry_count=0):
+    def __init__(self, current_page=1, retry_count=0, stop_page=-1):
         INFO("Current retry count at %d" % retry_count)
         self.current_page = current_page
+        self.stop_page = stop_page
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
     def spider_closed(self, spider): 
@@ -53,6 +55,7 @@ class JobsBankSpider(Spider):
         INFO("Storing current_page at page %s/%s" % (self.current_page, self.total_no_of_pages))
         data = {
             'current_page': self.current_page,
+            'stop_page': self.stop_page,
             'total': self.total_no_of_pages
         }
         pickle.dump(data, open(SESSION_P, "wb"))
@@ -92,7 +95,7 @@ class JobsBankSpider(Spider):
             request.meta['retryCount'] = 0
             yield request
 
-        if self.current_page < self.total_no_of_pages:
+        if self.current_page < self.total_no_of_pages and (self.stop_page == -1 or self.current_page < self.stop_page):
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             self.current_page += 1
@@ -107,6 +110,11 @@ class JobsBankSpider(Spider):
                                method="POST",
                                callback=self.parse_page)
         else:
+            if self.stop_page != -1:
+                INFO("Reached stop_page at %d, Done scraping page %d/%d" %
+                    (self.stop_page, self.current_page, self.total_no_of_pages))
+                return
+           
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             INFO("Finished scraping")
