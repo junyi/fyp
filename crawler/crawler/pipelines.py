@@ -226,25 +226,26 @@ class MySQLStorePipeline(object):
         jobId = self._get_id(item)
 
         location_id_list = []
-        location = item['location']
+        locations = item['locations']
 
-        ret = self._check_if_exists(conn, "location", {"description": location})
-        if ret:
-            location_id = self._get_one(conn, "location", ["locationId"], {"description": location})
-        else:
-            location_id = self._insert(conn, "location",\
-                {
-                    'description': location
-                })
+        for location in locations:
+            ret = self._check_if_exists(conn, "location", {"description": location})
+            if ret:
+                location_id = self._get_one(conn, "location", ["locationId"], {"description": location})
+            else:
+                location_id = self._insert(conn, "location",\
+                    {
+                        'description': location
+                    })
 
 
-        ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
-        if not ret:
-            self._insert(conn, "assoc_job_location",\
-                {
-                    "jobId": jobId, 
-                    "locationId": location_id
-                })
+            ret = self._check_if_exists(conn, "assoc_job_location", {"jobId": jobId, "locationId": location_id})
+            if not ret:
+                self._insert(conn, "assoc_job_location",\
+                    {
+                        "jobId": jobId, 
+                        "locationId": location_id
+                    })
 
     def _insert_job_level(self, conn, item):
         """

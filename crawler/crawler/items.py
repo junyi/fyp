@@ -14,7 +14,7 @@ class JobsBankItem(Item):
     title = Field()
     description = Field()
     requirements = Field()
-    location = Field()
+    locations = Field()
     industry = Field()
     categories = Field()
     empType = Field()

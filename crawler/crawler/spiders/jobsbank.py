@@ -85,14 +85,16 @@ class JobsBankSpider(Spider):
 
         for job in jobs:
             item = JobsBankItem()
-            location = job.xpath(
-                ".//td[@class='location']/label/text()").extract()[0]
+            locations = job.xpath(
+                ".//td[@class='location']/div/p/@title").extract()[0].split('|')
+            locations = [l.strip() for l in locations]
+            
             title = job.xpath(
                 ".//td[@class='jobDesActive']/a[@class='text']/text()").extract()[0]
 
             item["jobId"] = title[title.index("ID:") + 3: title.rfind(")")]
             DEBUG(item["jobId"])
-            item["location"] = location
+            item["locations"] = locations
 
             job_detail_link = "https://www.jobsbank.gov.sg" + job.xpath(
                 ".//td[@class='jobDesActive']/a/@href").extract()[0]
