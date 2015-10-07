@@ -139,21 +139,20 @@ class JobsBankSpider(Spider):
             return
 
     def parse_job(self, response):
-        try:
-            self.driver = webdriver.PhantomJS('/usr/bin/phantomjs', service_args=['--ssl-protocol=any'])
-            self.driver.get(response.url)
-        except URLError, e:
-            ERROR("Connection error for job %s" % response.meta['item']['jobId'])
-            self.stop = True
-            return
-
         # a bug in phantomjs: hang randomly
         # http://code.google.com/p/phantomjs/issues/detail?id=652
         timelimit = 10
         handler = signal.signal(signal.SIGALRM, timeout_handler)
         signal.alarm(timelimit)
-
         try:
+            try:
+                self.driver = webdriver.PhantomJS('/usr/bin/phantomjs', service_args=['--ssl-protocol=any'])
+                self.driver.get(response.url)
+            except URLError, e:
+                ERROR("Connection error for job %s" % response.meta['item']['jobId'])
+                self.stop = True
+                return
+
             try:
                 wait = WebDriverWait(self.driver, 10)
                 wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
@@ -165,6 +164,7 @@ class JobsBankSpider(Spider):
             self.driver.quit()
             if sys.platform is not 'win32':
                 os.system("killall phantomjs")
+            return
         finally:
             # reset the handler to the old one
             signal.signal(signal.SIGALRM, handler)
