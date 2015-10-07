@@ -55,7 +55,7 @@ def main():
             pickle.dump(data, open(SESSION_P, "wb"))
 
         if sys.platform is not 'win32':
-            os.system("killall -9 phantomjs")
+            os.system("killall phantomjs")
 
     install_shutdown_handlers(handle_shutdown)
     

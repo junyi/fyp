@@ -9,15 +9,18 @@ from html2text import html2text
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 from urllib2 import URLError
 
 # import pdb
+import sys
 import os
 import nltk
 import demjson
 import pickle
 import traceback
+import signal
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 SESSION_P = os.path.join(CUR_DIR, "..", "session.p")
@@ -88,7 +91,7 @@ class JobsBankSpider(Spider):
             locations = job.xpath(
                 ".//td[@class='location']/div/p/@title").extract()[0].split('|')
             locations = [l.strip() for l in locations]
-            
+
             title = job.xpath(
                 ".//td[@class='jobDesActive']/a[@class='text']/text()").extract()[0]
 
@@ -137,16 +140,38 @@ class JobsBankSpider(Spider):
 
     def parse_job(self, response):
         try:
-            self.driver = webdriver.PhantomJS(service_args=['--ssl-protocol=any'])
+            self.driver = webdriver.PhantomJS('/usr/bin/phantomjs', service_args=['--ssl-protocol=any'])
             self.driver.get(response.url)
         except URLError, e:
             ERROR("Connection error for job %s" % response.meta['item']['jobId'])
             self.stop = True
             return
 
-        wait = WebDriverWait(self.driver, 10)
-        wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
+        # a bug in phantomjs: hang randomly
+        # http://code.google.com/p/phantomjs/issues/detail?id=652
+        timelimit = 10
+        handler = signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(timelimit)
 
+        try:
+            try:
+                wait = WebDriverWait(self.driver, 10)
+                wait.until(lambda loaded: self.driver.execute_script("return document.readyState;") == "complete")
+            except TimeoutException:
+                traceback.print_exc(file=open("log/error.log","a"))
+                self.driver.quit()
+        except Exception:
+            print "PhantomJS is running beyond {} seconds, restarting".format(timelimit)
+            self.driver.quit()
+            if sys.platform is not 'win32':
+                os.system("killall phantomjs")
+        finally:
+            # reset the handler to the old one
+            signal.signal(signal.SIGALRM, handler)
+
+        # cancel the alarm
+        signal.alarm(0)
+            
         new_response = TextResponse(url=response.url, body=self.driver.page_source, encoding='utf-8')
         # pdb.set_trace()
         # self.driver.close()
@@ -217,3 +242,6 @@ class JobsBankSpider(Spider):
         #     f.write(demjson.encode(item)+"\n")
 
         yield item
+
+def timeout_handler(signum, frame):
+    raise Exception("Timeout!")
