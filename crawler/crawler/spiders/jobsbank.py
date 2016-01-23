@@ -45,10 +45,10 @@ class JobsBankSpider(Spider):
             INFO("Resetting current_page to 1")
             self.current_page = 1
             self.save_state()
-        
+
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
-    def spider_closed(self, spider): 
+    def spider_closed(self, spider):
         if spider is not self:
             return
 
@@ -127,7 +127,7 @@ class JobsBankSpider(Spider):
                 INFO("Reached stop_page at %d, Done scraping page %d/%d" %
                     (self.stop_page, self.current_page, self.total_no_of_pages))
                 return
-           
+
             INFO("Done scraping page %d/%d" %
                     (self.current_page, self.total_no_of_pages))
             INFO("Finished scraping")
@@ -171,7 +171,7 @@ class JobsBankSpider(Spider):
 
         # cancel the alarm
         signal.alarm(0)
-            
+
         new_response = TextResponse(url=response.url, body=self.driver.page_source, encoding='utf-8')
         # pdb.set_trace()
         # self.driver.close()
@@ -185,7 +185,7 @@ class JobsBankSpider(Spider):
         try:
 
             item["title"] = sel.xpath("//div[@class='jobDes']//h3/text()").extract()[0].strip()
-            
+
             postingDate = sel.xpath("//div[@class='jobDes']//div/p/text()").extract()[0]
             item["postingDate"] = postingDate[postingDate.index(":") + 1:].strip()
 
@@ -201,10 +201,10 @@ class JobsBankSpider(Spider):
             requirements = sel.xpath("//div[@id='divMainSkillsRequired']").extract()
             item["requirements"] = ''.join([html2text(i) for i in requirements])
 
-            categories = sel.xpath("//div[@class='jd_contentRight']/dl[1]//li/span/text()").extract()
+            categories = sel.xpath("//div[@class='jd_contentRight']/dl[2]//li/span/text()").extract()
             item["categories"] = [i.strip() for i in categories]
 
-            item["industry"] = sel.xpath("//div[@class='jd_contentRight']/dl[2]//span/text()").extract()[0].strip()
+            item["industry"] = sel.xpath("//div[@class='jd_contentRight']/dl[3]//span/text()").extract()[0].strip()
 
             item["empType"] = sel.xpath("//div[@class='jd_contentRight']/ul[1]//li/span/text()").extract()
 
